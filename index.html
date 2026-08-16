@@ -21,6 +21,7 @@
           <label>Correo<input id="email" type="email" autocomplete="email" required /></label>
           <label>Contraseña<input id="password" type="password" minlength="6" autocomplete="current-password" required /></label>
           <button type="submit">Entrar</button><button type="button" id="signupBtn" class="secondary">Crear cuenta</button>
+          <button type="button" id="forgotPasswordBtn" class="secondary">¿Olvidaste tu contraseña?</button>
         </form><p id="authMessage" class="message"></p>
       </section>
       <section id="appView" class="hidden">
@@ -45,4 +46,25 @@
   <dialog id="inviteDialog"><form id="inviteForm" method="dialog" class="stack"><div class="dialog-head"><h2>Compartir huerta</h2><button type="button" class="icon-btn" data-close="inviteDialog">×</button></div><p>La otra persona debe crear primero una cuenta en esta app. Después podrás agregarla por correo.</p><label>Correo del colaborador<input id="inviteEmail" type="email" required placeholder="persona@correo.com" /></label><button type="submit">Dar acceso para editar</button></form></dialog>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js"></script>
+  <script>
+    const forgotPasswordBtn=document.getElementById('forgotPasswordBtn');
+    forgotPasswordBtn.addEventListener('click',async()=>{
+      const email=document.getElementById('email').value.trim();
+      if(!email){msg('Escribe primero tu correo.',true);return}
+      msg('Enviando enlace para cambiar la contraseña…');
+      const redirectTo=location.origin+location.pathname;
+      const {error}=await db.auth.resetPasswordForEmail(email,{redirectTo});
+      msg(error?error.message:'Te enviamos un correo. Ábrelo y pulsa el enlace para crear una contraseña nueva.',!!error);
+    });
+
+    db.auth.onAuthStateChange(async(event)=>{
+      if(event!=='PASSWORD_RECOVERY')return;
+      const newPassword=prompt('Escribe tu nueva contraseña (mínimo 6 caracteres):');
+      if(newPassword===null)return;
+      if(newPassword.length<6){alert('La contraseña debe tener al menos 6 caracteres.');return}
+      const {error}=await db.auth.updateUser({password:newPassword});
+      if(error){alert('No se pudo cambiar la contraseña: '+error.message);return}
+      alert('Contraseña actualizada. Ya puedes entrar con la nueva contraseña.');
+    });
+  </script>
 </body></html>
