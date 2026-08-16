@@ -11,103 +11,38 @@
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <div>
-        <p class="eyebrow">Control de cultivos</p>
-        <h1>Mi Huerta 🌱</h1>
-      </div>
-      <button id="logoutBtn" class="ghost hidden">Salir</button>
+      <div><p class="eyebrow">Control de cultivos</p><h1>Mi Huerta 🌱</h1></div>
+      <div class="card-actions"><button id="inviteBtn" class="ghost hidden">Compartir</button><button id="logoutBtn" class="ghost hidden">Salir</button></div>
     </header>
-
     <main>
       <section id="authView" class="auth-card">
-        <h2>Entrar</h2>
-        <p>Usa tu correo para guardar y sincronizar tu huerta.</p>
+        <h2>Entrar</h2><p>Usa tu correo para guardar y sincronizar tu huerta.</p>
         <form id="authForm" class="stack">
           <label>Correo<input id="email" type="email" autocomplete="email" required /></label>
           <label>Contraseña<input id="password" type="password" minlength="6" autocomplete="current-password" required /></label>
-          <button type="submit">Entrar</button>
-          <button type="button" id="signupBtn" class="secondary">Crear cuenta</button>
-        </form>
-        <p id="authMessage" class="message"></p>
+          <button type="submit">Entrar</button><button type="button" id="signupBtn" class="secondary">Crear cuenta</button>
+        </form><p id="authMessage" class="message"></p>
       </section>
-
       <section id="appView" class="hidden">
-        <section class="summary-grid">
-          <article><strong id="cropCount">0</strong><span>Cultivos</span></article>
-          <article><strong id="pendingCount">0</strong><span>Tareas pendientes</span></article>
-          <article><strong id="germinationRate">—</strong><span>Germinación</span></article>
-        </section>
-
-        <nav class="tabs" aria-label="Secciones">
-          <button class="tab active" data-tab="crops">Cultivos</button>
-          <button class="tab" data-tab="tasks">Tareas</button>
-          <button class="tab" data-tab="calendar">Calendario</button>
-          <button class="tab" data-tab="logs">Registro</button>
-        </nav>
-
+        <div id="gardenNotice" class="card hidden" style="margin-bottom:12px"></div>
+        <section class="summary-grid"><article><strong id="cropCount">0</strong><span>Cultivos</span></article><article><strong id="pendingCount">0</strong><span>Tareas pendientes</span></article><article><strong id="germinationRate">—</strong><span>Germinación</span></article></section>
+        <nav class="tabs" aria-label="Secciones"><button class="tab active" data-tab="crops">Cultivos</button><button class="tab" data-tab="tasks">Tareas</button><button class="tab" data-tab="calendar">Calendario</button><button class="tab" data-tab="logs">Registro</button></nav>
         <section id="crops" class="tab-panel">
           <div class="section-head"><div><p class="eyebrow">Siembras</p><h2>Mis cultivos</h2></div><button id="newCropBtn">+ Nuevo</button></div>
-          <div class="card" style="margin-bottom:12px">
-            <div class="card-top">
-              <div><h3>Siembra de la libreta</h3><div class="meta">16/08/2026 · 12 cultivos · 5 unidades cada uno</div></div>
-            </div>
-            <div class="card-actions"><button id="importNotebookBtn" class="secondary">Importar libreta 16/08/2026</button></div>
-          </div>
+          <div class="card" style="margin-bottom:12px"><div class="card-top"><div><h3>Siembra de la libreta</h3><div class="meta">16/08/2026 · 12 cultivos · 5 unidades cada uno</div></div></div><div class="card-actions"><button id="importNotebookBtn" class="secondary">Importar libreta 16/08/2026</button></div></div>
           <div id="cropList" class="cards"></div>
         </section>
-
-        <section id="tasks" class="tab-panel hidden">
-          <div class="section-head"><div><p class="eyebrow">Próximos pasos</p><h2>Tareas</h2></div><button id="newTaskBtn">+ Tarea</button></div>
-          <div id="taskList" class="cards"></div>
-        </section>
-
-        <section id="calendar" class="tab-panel hidden">
-          <div class="section-head"><div><p class="eyebrow">Fechas clave</p><h2>Calendario</h2></div></div>
-          <div id="calendarList" class="timeline"></div>
-        </section>
-
-        <section id="logs" class="tab-panel hidden">
-          <div class="section-head"><div><p class="eyebrow">Historial</p><h2>Registro</h2></div><button id="newLogBtn">+ Registrar</button></div>
-          <div id="logList" class="cards"></div>
-        </section>
+        <section id="tasks" class="tab-panel hidden"><div class="section-head"><div><p class="eyebrow">Próximos pasos</p><h2>Tareas</h2></div><button id="newTaskBtn">+ Tarea</button></div><div id="taskList" class="cards"></div></section>
+        <section id="calendar" class="tab-panel hidden"><div class="section-head"><div><p class="eyebrow">Fechas clave</p><h2>Calendario</h2></div></div><div id="calendarList" class="timeline"></div></section>
+        <section id="logs" class="tab-panel hidden"><div class="section-head"><div><p class="eyebrow">Historial</p><h2>Registro</h2></div><button id="newLogBtn">+ Registrar</button></div><div id="logList" class="cards"></div></section>
       </section>
     </main>
   </div>
 
-  <dialog id="cropDialog">
-    <form id="cropForm" method="dialog" class="stack">
-      <div class="dialog-head"><h2>Nuevo cultivo</h2><button type="button" class="icon-btn" data-close="cropDialog">×</button></div>
-      <label>Cultivo<input id="cropName" required placeholder="Tomate" /></label>
-      <label>Variedad<input id="cropVariety" placeholder="Cherry, Roma…" /></label>
-      <div class="two-col"><label>Cantidad sembrada<input id="cropQty" type="number" min="1" value="1" required /></label><label>Fecha de siembra<input id="cropDate" type="date" required /></label></div>
-      <label>Ubicación<input id="cropLocation" placeholder="Cama 1, maceta…" /></label>
-      <label>Notas<textarea id="cropNotes" rows="3"></textarea></label>
-      <button type="submit">Guardar cultivo</button>
-    </form>
-  </dialog>
+  <dialog id="cropDialog"><form id="cropForm" method="dialog" class="stack"><div class="dialog-head"><h2>Nuevo cultivo</h2><button type="button" class="icon-btn" data-close="cropDialog">×</button></div><label>Cultivo<input id="cropName" required placeholder="Tomate" /></label><label>Variedad<input id="cropVariety" placeholder="Cherry, Roma…" /></label><div class="two-col"><label>Cantidad sembrada<input id="cropQty" type="number" min="1" value="1" required /></label><label>Fecha de siembra<input id="cropDate" type="date" required /></label></div><label>Ubicación<input id="cropLocation" placeholder="Cama 1, maceta…" /></label><label>Notas<textarea id="cropNotes" rows="3"></textarea></label><button type="submit">Guardar cultivo</button></form></dialog>
+  <dialog id="taskDialog"><form id="taskForm" method="dialog" class="stack"><div class="dialog-head"><h2>Nueva tarea</h2><button type="button" class="icon-btn" data-close="taskDialog">×</button></div><label>Título<input id="taskTitle" required placeholder="Revisar germinación" /></label><label>Cultivo<select id="taskCrop"></select></label><label>Tipo<select id="taskType"><option value="riego">Riego</option><option value="revisar_germinacion">Revisar germinación</option><option value="trasplante">Trasplante</option><option value="fertilizacion">Fertilización</option><option value="control_plagas">Control de plagas</option><option value="cosecha">Cosecha</option><option value="otro">Otro</option></select></label><label>Fecha<input id="taskDate" type="date" required /></label><button type="submit">Guardar tarea</button></form></dialog>
+  <dialog id="logDialog"><form id="logForm" method="dialog" class="stack"><div class="dialog-head"><h2>Registrar actividad</h2><button type="button" class="icon-btn" data-close="logDialog">×</button></div><label>Cultivo<select id="logCrop" required></select></label><label>Actividad<select id="logType"><option value="riego">Riego</option><option value="fertilizacion">Fertilización</option><option value="trasplante">Trasplante</option><option value="plaga">Plaga</option><option value="observacion">Observación</option><option value="cosecha">Cosecha</option><option value="foto">Foto</option><option value="otro">Otro</option></select></label><label>Notas<textarea id="logNotes" rows="3"></textarea></label><button type="submit">Guardar registro</button></form></dialog>
+  <dialog id="inviteDialog"><form id="inviteForm" method="dialog" class="stack"><div class="dialog-head"><h2>Compartir huerta</h2><button type="button" class="icon-btn" data-close="inviteDialog">×</button></div><p>La otra persona debe crear primero una cuenta en esta app. Después podrás agregarla por correo.</p><label>Correo del colaborador<input id="inviteEmail" type="email" required placeholder="persona@correo.com" /></label><button type="submit">Dar acceso para editar</button></form></dialog>
 
-  <dialog id="taskDialog">
-    <form id="taskForm" method="dialog" class="stack">
-      <div class="dialog-head"><h2>Nueva tarea</h2><button type="button" class="icon-btn" data-close="taskDialog">×</button></div>
-      <label>Título<input id="taskTitle" required placeholder="Revisar germinación" /></label>
-      <label>Cultivo<select id="taskCrop"></select></label>
-      <label>Tipo<select id="taskType"><option value="riego">Riego</option><option value="revisar_germinacion">Revisar germinación</option><option value="trasplante">Trasplante</option><option value="fertilizacion">Fertilización</option><option value="control_plagas">Control de plagas</option><option value="cosecha">Cosecha</option><option value="otro">Otro</option></select></label>
-      <label>Fecha<input id="taskDate" type="date" required /></label>
-      <button type="submit">Guardar tarea</button>
-    </form>
-  </dialog>
-
-  <dialog id="logDialog">
-    <form id="logForm" method="dialog" class="stack">
-      <div class="dialog-head"><h2>Registrar actividad</h2><button type="button" class="icon-btn" data-close="logDialog">×</button></div>
-      <label>Cultivo<select id="logCrop" required></select></label>
-      <label>Actividad<select id="logType"><option value="riego">Riego</option><option value="fertilizacion">Fertilización</option><option value="trasplante">Trasplante</option><option value="plaga">Plaga</option><option value="observacion">Observación</option><option value="cosecha">Cosecha</option><option value="foto">Foto</option><option value="otro">Otro</option></select></label>
-      <label>Notas<textarea id="logNotes" rows="3"></textarea></label>
-      <button type="submit">Guardar registro</button>
-    </form>
-  </dialog>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="app.js"></script>
-</body>
-</html>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js"></script>
+</body></html>
