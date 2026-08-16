@@ -85,6 +85,28 @@ $('cropForm').addEventListener('submit',async e=>{e.preventDefault();const row={
 $('taskForm').addEventListener('submit',async e=>{e.preventDefault();const row={owner_id:session.user.id,crop_id:$('taskCrop').value||null,title:$('taskTitle').value.trim(),task_type:$('taskType').value,due_date:$('taskDate').value};const {error}=await db.from('tasks').insert(row);if(error)return alert(error.message);$('taskForm').reset();$('taskDialog').close();await refreshAll()});
 $('logForm').addEventListener('submit',async e=>{e.preventDefault();const row={owner_id:session.user.id,crop_id:$('logCrop').value,log_type:$('logType').value,notes:$('logNotes').value.trim()||null};const {error}=await db.from('crop_logs').insert(row);if(error)return alert(error.message);$('logForm').reset();$('logDialog').close();await refreshAll()});
 
+$('importNotebookBtn').addEventListener('click',async()=>{
+  const date='2026-08-16';
+  const notebook=[
+    ['Zucchini','Cocozelle'],['Kale','Enano'],['Pak Choi',null],['Arúgula',null],
+    ['Albahaca','Morada'],['Tomate','Cherry rojo'],['Lechuga','Morada'],
+    ['Lechuga','Salad Bowl'],['Chile dulce',null],['Tomate','Cherry pera'],
+    ['Eneldo',null],['Zanahoria',null]
+  ];
+  const existing=new Set(crops.filter(c=>c.sowing_date===date).map(c=>`${(c.name||'').toLowerCase()}|${(c.variety||'').toLowerCase()}`));
+  const rows=notebook
+    .filter(([name,variety])=>!existing.has(`${name.toLowerCase()}|${(variety||'').toLowerCase()}`))
+    .map(([name,variety])=>({owner_id:session.user.id,name,variety,quantity_sown:5,sowing_date:date,status:'sembrado',notes:'Importado de la libreta del 16/08/2026'}));
+  if(!rows.length)return alert('Esta siembra ya está cargada.');
+  if(!confirm(`Se agregarán ${rows.length} cultivos de la libreta del 16/08/2026. ¿Continuar?`))return;
+  const btn=$('importNotebookBtn');btn.disabled=true;btn.textContent='Importando…';
+  const {error}=await db.from('crops').insert(rows);
+  btn.disabled=false;btn.textContent='Importar libreta 16/08/2026';
+  if(error)return alert(error.message);
+  await refreshAll();
+  alert('Listo: cultivos importados.');
+});
+
 window.setGerminated=async(id,max)=>{const current=crops.find(c=>c.id===id)?.quantity_germinated??0;const raw=prompt(`¿Cuántas germinaron? (máximo ${max})`,current);if(raw===null)return;const n=Number(raw);if(!Number.isInteger(n)||n<0||n>max)return alert('Cantidad inválida.');const {error}=await db.from('crops').update({quantity_germinated:n,status:n>0?'germinando':'sembrado'}).eq('id',id);if(error)return alert(error.message);await refreshAll()};
 window.quickLog=id=>{$('logCrop').value=id;$('logDialog').showModal()};
 window.completeTask=async id=>{const {error}=await db.from('tasks').update({completed_at:new Date().toISOString()}).eq('id',id);if(error)return alert(error.message);await refreshAll()};
