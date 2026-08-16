@@ -1,0 +1,10 @@
+{
+  "name": "Mi Huerta",
+  "short_name": "Huerta",
+  "description": "Control de siembras, tareas, registros y cosechas",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f7f2",
+  "theme_color": "#173f2a",
+  "lang": "es"
+}
