@@ -41,7 +41,7 @@ function buildDailyEmail(){
   lines.push('Enviado desde Mi Huerta 🌱');return lines.join('\n');
 }
 window.emailDailySummary=()=>{const defaultEmail=session?.user?.email||'';const recipient=prompt('¿A qué correo quieres enviar el resumen diario?',defaultEmail);if(recipient===null)return;const email=recipient.trim();if(!email)return alert('Escribe un correo válido.');const subject=`Mi Huerta — resumen diario ${fmt(today())}`;window.location.href=`mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(buildDailyEmail())}`};
-window.whatsappDailySummary=()=>{const text=buildDailyEmail();window.open(`https://wa.me/?text=${encodeURIComponent(text)}`,'_blank')};
+window.whatsappDailySummary=()=>{const text=buildDailyEmail();const url=`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;window.location.href=url};
 window.toggleDaily=(id,checked)=>{const d=dailyDone();if(checked)d[id]=new Date().toISOString();else delete d[id];localStorage.setItem(dailyKey(),JSON.stringify(d));renderDailyChecklist()};
 const dailyObserver=new MutationObserver(()=>renderDailyChecklist());
 window.addEventListener('DOMContentLoaded',()=>{const cropList=document.getElementById('cropList');if(cropList)dailyObserver.observe(cropList,{childList:true,subtree:true});const emailBtn=document.getElementById('emailDailyBtn');if(emailBtn)emailBtn.addEventListener('click',emailDailySummary);const waBtn=document.getElementById('whatsappDailyBtn');if(waBtn)waBtn.addEventListener('click',whatsappDailySummary);setTimeout(renderDailyChecklist,350)});
