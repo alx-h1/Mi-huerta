@@ -30,5 +30,52 @@
   <dialog id="taskDialog"><form id="taskForm" method="dialog" class="stack"><div class="dialog-head"><h2>Nueva tarea</h2><button type="button" class="icon-btn" data-close="taskDialog">×</button></div><label>Título<input id="taskTitle" required placeholder="Revisar germinación" /></label><label>Cultivo<select id="taskCrop"></select></label><label>Tipo<select id="taskType"><option value="riego">Riego</option><option value="revisar_germinacion">Revisar germinación</option><option value="trasplante">Trasplante</option><option value="fertilizacion">Fertilización</option><option value="control_plagas">Control de plagas</option><option value="cosecha">Cosecha</option><option value="otro">Otro</option></select></label><label>Fecha<input id="taskDate" type="date" required /></label><button type="submit">Guardar tarea</button></form></dialog>
   <dialog id="logDialog"><form id="logForm" method="dialog" class="stack"><div class="dialog-head"><h2>Registrar actividad</h2><button type="button" class="icon-btn" data-close="logDialog">×</button></div><label>Cultivo<select id="logCrop" required></select></label><label>Actividad<select id="logType"><option value="riego">Riego</option><option value="fertilizacion">Fertilización</option><option value="trasplante">Trasplante</option><option value="plaga">Plaga</option><option value="observacion">Observación</option><option value="cosecha">Cosecha</option><option value="foto">Foto</option><option value="otro">Otro</option></select></label><label>Notas<textarea id="logNotes" rows="3"></textarea></label><button type="submit">Guardar registro</button></form></dialog>
   <dialog id="inviteDialog"><form id="inviteForm" method="dialog" class="stack"><div class="dialog-head"><h2>Compartir huerta</h2><button type="button" class="icon-btn" data-close="inviteDialog">×</button></div><p>La otra persona debe entrar primero en Mi Huerta con su correo. Después podrás agregarla por ese mismo correo.</p><label>Correo del colaborador<input id="inviteEmail" type="email" required placeholder="persona@correo.com" /></label><button type="submit">Dar acceso para editar</button></form></dialog>
+
+  <dialog id="setupDialog">
+    <div class="stack">
+      <div class="dialog-head"><h2>Acceso configurado ✓</h2><button type="button" class="icon-btn" id="closeSetupBtn">×</button></div>
+      <p>Ya entraste correctamente. Para crear el acceso directo, usa el enlace normal de Mi Huerta de abajo; no guardes el enlace temporal que llegó por correo.</p>
+      <label>Enlace para tu pantalla de inicio<input id="normalAppUrl" type="text" readonly /></label>
+      <button type="button" id="copyAppUrlBtn">Copiar enlace de Mi Huerta</button>
+      <div class="rec-note">En iPhone: abre este enlace en Safari → Compartir ↑ → Agregar a pantalla de inicio. Después podrás abrir Mi Huerta desde el ícono 🌱 mientras la sesión siga guardada.</div>
+      <p id="copyAppUrlMessage" class="message"></p>
+    </div>
+  </dialog>
+
+  <script>window.MI_HUERTA_EMAIL_RETURN=/access_token=|refresh_token=|type=magiclink|token_hash=/.test(location.hash+location.search);</script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js"></script><script src="recommendations.js"></script><script src="daily.js"></script>
+  <script>
+    (()=>{
+      const dialog=document.getElementById('setupDialog');
+      const urlInput=document.getElementById('normalAppUrl');
+      const copyBtn=document.getElementById('copyAppUrlBtn');
+      const closeBtn=document.getElementById('closeSetupBtn');
+      const copyMsg=document.getElementById('copyAppUrlMessage');
+      const normalUrl=location.origin+location.pathname;
+      urlInput.value=normalUrl;
+
+      const showSetup=async()=>{
+        if(!window.MI_HUERTA_EMAIL_RETURN)return;
+        const {data}=await db.auth.getSession();
+        if(!data.session)return;
+        history.replaceState({},document.title,normalUrl);
+        if(!dialog.open)dialog.showModal();
+        window.MI_HUERTA_EMAIL_RETURN=false;
+      };
+
+      copyBtn.addEventListener('click',async()=>{
+        try{
+          await navigator.clipboard.writeText(normalUrl);
+          copyMsg.textContent='Enlace copiado. Ahora puedes pegarlo en Safari.';
+          copyMsg.style.color='#286146';
+        }catch(_){
+          urlInput.focus();urlInput.select();
+          copyMsg.textContent='Mantén pulsado el enlace y selecciona Copiar.';
+        }
+      });
+      closeBtn.addEventListener('click',()=>dialog.close());
+      db.auth.onAuthStateChange((event,s)=>{if(s&&(event==='SIGNED_IN'||event==='INITIAL_SESSION'))setTimeout(showSetup,150)});
+      setTimeout(showSetup,500);
+    })();
+  </script>
 </body></html>
