@@ -33,26 +33,27 @@
 
   <dialog id="setupDialog">
     <div class="stack">
-      <div class="dialog-head"><h2>Acceso configurado ✓</h2><button type="button" class="icon-btn" id="closeSetupBtn">×</button></div>
-      <p>Ya entraste correctamente. Para crear el acceso directo, usa el enlace normal de Mi Huerta de abajo; no guardes el enlace temporal que llegó por correo.</p>
-      <label>Enlace para tu pantalla de inicio<input id="normalAppUrl" type="text" readonly /></label>
-      <button type="button" id="copyAppUrlBtn">Copiar enlace de Mi Huerta</button>
-      <div class="rec-note">En iPhone: abre este enlace en Safari → Compartir ↑ → Agregar a pantalla de inicio. Después podrás abrir Mi Huerta desde el ícono 🌱 mientras la sesión siga guardada.</div>
-      <p id="copyAppUrlMessage" class="message"></p>
+      <div class="dialog-head"><h2>Configurar ícono de Mi Huerta</h2><button type="button" class="icon-btn" id="closeSetupBtn">×</button></div>
+      <p>Como ya estás dentro en Safari, puedes generar aquí un enlace de activación sin depender del correo. Cópialo y pégalo dentro del ícono instalado de Mi Huerta.</p>
+      <button type="button" id="generateDeviceLinkBtn">Generar enlace para el ícono</button>
+      <label>Enlace de activación<input id="deviceLinkOutput" type="text" readonly placeholder="Pulsa Generar enlace" /></label>
+      <button type="button" id="copyDeviceLinkBtn" class="secondary">Copiar enlace de activación</button>
+      <div class="rec-note">Después: vuelve a la pantalla de inicio → abre 🌱 Mi Huerta → pega este enlace en “Enlace del correo” → “Activar este dispositivo”. El enlace es de un solo uso.</div>
+      <p id="deviceLinkMessage" class="message"></p>
     </div>
   </dialog>
 
   <script>window.MI_HUERTA_EMAIL_RETURN=/access_token=|refresh_token=|type=magiclink|token_hash=/.test(location.hash+location.search);</script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js"></script><script src="recommendations.js"></script><script src="daily.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js"></script><script src="recommendations.js"></script><script src="daily.js"></script><script src="auth-paste.js"></script>
   <script>
     (()=>{
       const dialog=document.getElementById('setupDialog');
-      const urlInput=document.getElementById('normalAppUrl');
-      const copyBtn=document.getElementById('copyAppUrlBtn');
       const closeBtn=document.getElementById('closeSetupBtn');
-      const copyMsg=document.getElementById('copyAppUrlMessage');
+      const generateBtn=document.getElementById('generateDeviceLinkBtn');
+      const copyBtn=document.getElementById('copyDeviceLinkBtn');
+      const output=document.getElementById('deviceLinkOutput');
+      const message=document.getElementById('deviceLinkMessage');
       const normalUrl=location.origin+location.pathname;
-      urlInput.value=normalUrl;
 
       const showSetup=async()=>{
         if(!window.MI_HUERTA_EMAIL_RETURN)return;
@@ -63,15 +64,19 @@
         window.MI_HUERTA_EMAIL_RETURN=false;
       };
 
+      generateBtn.addEventListener('click',async()=>{
+        generateBtn.disabled=true;message.textContent='Generando enlace de activación…';message.style.color='';
+        const {data,error}=await db.functions.invoke('create-device-link',{body:{}});
+        generateBtn.disabled=false;
+        if(error||!data?.action_link){message.textContent=error?.message||data?.error||'No se pudo generar el enlace.';message.style.color='#9b4138';return;}
+        output.value=data.action_link;
+        message.textContent='Listo. Ahora copia este enlace y úsalo en el ícono de Mi Huerta.';message.style.color='#286146';
+      });
+
       copyBtn.addEventListener('click',async()=>{
-        try{
-          await navigator.clipboard.writeText(normalUrl);
-          copyMsg.textContent='Enlace copiado. Ahora puedes pegarlo en Safari.';
-          copyMsg.style.color='#286146';
-        }catch(_){
-          urlInput.focus();urlInput.select();
-          copyMsg.textContent='Mantén pulsado el enlace y selecciona Copiar.';
-        }
+        if(!output.value){message.textContent='Primero genera el enlace de activación.';message.style.color='#9b4138';return;}
+        try{await navigator.clipboard.writeText(output.value);message.textContent='Enlace copiado. Ya puedes abrir el ícono de Mi Huerta.';message.style.color='#286146';}
+        catch(_){output.focus();output.select();message.textContent='Seleccioné el enlace. Elige Copiar.';}
       });
       closeBtn.addEventListener('click',()=>dialog.close());
       db.auth.onAuthStateChange((event,s)=>{if(s&&(event==='SIGNED_IN'||event==='INITIAL_SESSION'))setTimeout(showSetup,150)});
