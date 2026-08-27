@@ -12,7 +12,7 @@
   <div class="app-shell">
     <header class="topbar"><div><p class="eyebrow">Control de cultivos</p><h1>Mi Huerta 🌱</h1></div><div class="card-actions"><button id="inviteBtn" class="ghost hidden">Compartir</button><button id="logoutBtn" class="ghost hidden">Salir</button></div></header>
     <main>
-      <section id="authView" class="auth-card"><h2>Entrar</h2><p>Escribe tu correo y te enviaremos un enlace para entrar. No necesitas contraseña.</p><form id="authForm" class="stack"><label>Correo<input id="email" type="email" autocomplete="email" required /></label><button type="submit">Enviarme enlace de acceso</button></form><p id="authMessage" class="message"></p></section>
+      <section id="authView" class="auth-card"><h2>Entrar</h2><p>Usa tu correo y contraseña para entrar a tu huerta.</p><form id="authForm" class="stack"><label>Correo<input id="email" type="email" autocomplete="email" required /></label><label>Contraseña<input id="password" type="password" minlength="6" autocomplete="current-password" required /></label><button type="submit">Entrar</button></form><p id="authMessage" class="message"></p></section>
       <section id="appView" class="hidden">
         <div id="gardenNotice" class="card hidden" style="margin-bottom:12px"></div>
         <section class="summary-grid"><article><strong id="cropCount">0</strong><span>Cultivos</span></article><article><strong id="pendingCount">0</strong><span>Tareas pendientes</span></article><article><strong id="germinationRate">—</strong><span>Germinación</span></article><article class="alert-summary"><strong id="alertCount">0</strong><span>Alertas de cultivo</span></article></section>
@@ -29,58 +29,8 @@
   <dialog id="cropDialog"><form id="cropForm" method="dialog" class="stack"><div class="dialog-head"><h2>Nuevo cultivo</h2><button type="button" class="icon-btn" data-close="cropDialog">×</button></div><label>Cultivo<input id="cropName" required placeholder="Tomate" /></label><label>Variedad<input id="cropVariety" placeholder="Cherry, Roma…" /></label><div class="two-col"><label>Cantidad sembrada<input id="cropQty" type="number" min="1" value="1" required /></label><label>Fecha de siembra<input id="cropDate" type="date" required /></label></div><label>Ubicación<input id="cropLocation" placeholder="Cama 1, maceta…" /></label><label>Notas<textarea id="cropNotes" rows="3"></textarea></label><button type="submit">Guardar cultivo</button></form></dialog>
   <dialog id="taskDialog"><form id="taskForm" method="dialog" class="stack"><div class="dialog-head"><h2>Nueva tarea</h2><button type="button" class="icon-btn" data-close="taskDialog">×</button></div><label>Título<input id="taskTitle" required placeholder="Revisar germinación" /></label><label>Cultivo<select id="taskCrop"></select></label><label>Tipo<select id="taskType"><option value="riego">Riego</option><option value="revisar_germinacion">Revisar germinación</option><option value="trasplante">Trasplante</option><option value="fertilizacion">Fertilización</option><option value="control_plagas">Control de plagas</option><option value="cosecha">Cosecha</option><option value="otro">Otro</option></select></label><label>Fecha<input id="taskDate" type="date" required /></label><button type="submit">Guardar tarea</button></form></dialog>
   <dialog id="logDialog"><form id="logForm" method="dialog" class="stack"><div class="dialog-head"><h2>Registrar actividad</h2><button type="button" class="icon-btn" data-close="logDialog">×</button></div><label>Cultivo<select id="logCrop" required></select></label><label>Actividad<select id="logType"><option value="riego">Riego</option><option value="fertilizacion">Fertilización</option><option value="trasplante">Trasplante</option><option value="plaga">Plaga</option><option value="observacion">Observación</option><option value="cosecha">Cosecha</option><option value="foto">Foto</option><option value="otro">Otro</option></select></label><label>Notas<textarea id="logNotes" rows="3"></textarea></label><button type="submit">Guardar registro</button></form></dialog>
-  <dialog id="inviteDialog"><form id="inviteForm" method="dialog" class="stack"><div class="dialog-head"><h2>Compartir huerta</h2><button type="button" class="icon-btn" data-close="inviteDialog">×</button></div><p>La otra persona debe entrar primero en Mi Huerta con su correo. Después podrás agregarla por ese mismo correo.</p><label>Correo del colaborador<input id="inviteEmail" type="email" required placeholder="persona@correo.com" /></label><button type="submit">Dar acceso para editar</button></form></dialog>
+  <dialog id="inviteDialog"><form id="inviteForm" method="dialog" class="stack"><div class="dialog-head"><h2>Compartir huerta</h2><button type="button" class="icon-btn" data-close="inviteDialog">×</button></div><p>La otra persona debe tener una cuenta en Mi Huerta. Después podrás agregarla por su correo.</p><label>Correo del colaborador<input id="inviteEmail" type="email" required placeholder="persona@correo.com" /></label><button type="submit">Dar acceso para editar</button></form></dialog>
 
-  <dialog id="setupDialog">
-    <div class="stack">
-      <div class="dialog-head"><h2>Configurar ícono de Mi Huerta</h2><button type="button" class="icon-btn" id="closeSetupBtn">×</button></div>
-      <p>Como ya estás dentro en Safari, puedes generar aquí un enlace de activación sin depender del correo. Cópialo y pégalo dentro del ícono instalado de Mi Huerta.</p>
-      <button type="button" id="generateDeviceLinkBtn">Generar enlace para el ícono</button>
-      <label>Enlace de activación<input id="deviceLinkOutput" type="text" readonly placeholder="Pulsa Generar enlace" /></label>
-      <button type="button" id="copyDeviceLinkBtn" class="secondary">Copiar enlace de activación</button>
-      <div class="rec-note">Después: vuelve a la pantalla de inicio → abre 🌱 Mi Huerta → pega este enlace en “Enlace del correo” → “Activar este dispositivo”. El enlace es de un solo uso.</div>
-      <p id="deviceLinkMessage" class="message"></p>
-    </div>
-  </dialog>
 
-  <script>window.MI_HUERTA_EMAIL_RETURN=/access_token=|refresh_token=|type=magiclink|token_hash=/.test(location.hash+location.search);</script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js"></script><script src="recommendations.js"></script><script src="daily.js"></script><script src="auth-paste.js"></script>
-  <script>
-    (()=>{
-      const dialog=document.getElementById('setupDialog');
-      const closeBtn=document.getElementById('closeSetupBtn');
-      const generateBtn=document.getElementById('generateDeviceLinkBtn');
-      const copyBtn=document.getElementById('copyDeviceLinkBtn');
-      const output=document.getElementById('deviceLinkOutput');
-      const message=document.getElementById('deviceLinkMessage');
-      const normalUrl=location.origin+location.pathname;
-
-      const showSetup=async()=>{
-        if(!window.MI_HUERTA_EMAIL_RETURN)return;
-        const {data}=await db.auth.getSession();
-        if(!data.session)return;
-        history.replaceState({},document.title,normalUrl);
-        if(!dialog.open)dialog.showModal();
-        window.MI_HUERTA_EMAIL_RETURN=false;
-      };
-
-      generateBtn.addEventListener('click',async()=>{
-        generateBtn.disabled=true;message.textContent='Generando enlace de activación…';message.style.color='';
-        const {data,error}=await db.functions.invoke('create-device-link',{body:{}});
-        generateBtn.disabled=false;
-        if(error||!data?.action_link){message.textContent=error?.message||data?.error||'No se pudo generar el enlace.';message.style.color='#9b4138';return;}
-        output.value=data.action_link;
-        message.textContent='Listo. Ahora copia este enlace y úsalo en el ícono de Mi Huerta.';message.style.color='#286146';
-      });
-
-      copyBtn.addEventListener('click',async()=>{
-        if(!output.value){message.textContent='Primero genera el enlace de activación.';message.style.color='#9b4138';return;}
-        try{await navigator.clipboard.writeText(output.value);message.textContent='Enlace copiado. Ya puedes abrir el ícono de Mi Huerta.';message.style.color='#286146';}
-        catch(_){output.focus();output.select();message.textContent='Seleccioné el enlace. Elige Copiar.';}
-      });
-      closeBtn.addEventListener('click',()=>dialog.close());
-      db.auth.onAuthStateChange((event,s)=>{if(s&&(event==='SIGNED_IN'||event==='INITIAL_SESSION'))setTimeout(showSetup,150)});
-      setTimeout(showSetup,500);
-    })();
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js"></script><script src="recommendations.js"></script><script src="daily.js"></script>
 </body></html>
